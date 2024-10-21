@@ -1,0 +1,2 @@
+from aiogram import Bot
+
