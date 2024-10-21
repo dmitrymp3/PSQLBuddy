@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 import logging
-from conf.config import boto_config, temp_path, rules_for_backups, Config
+from conf.config import temp_path, rules_for_backups, Config
 # import pprint
 from pprint import pprint
 
@@ -13,7 +13,7 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 logging.getLogger('nose').setLevel(logging.WARNING)
 
 # Создаем клиент для коннекта к s3 хранилищу
-s3 = boto3.client('s3', **boto_config.return_data())
+s3 = boto3.client('s3', **Config.boto_config.return_data())
 
 # Добавим финальный слэш во временную папку, здесь он нужен
 temp_folder = f'{temp_path}/'
@@ -23,7 +23,7 @@ def upload_file(filename):
     """
     Просто загружает файл в бакет
     """
-    s3.upload_file(temp_folder + filename, boto_config.s3_bucket, filename)
+    s3.upload_file(temp_folder + filename, Config.boto_config.s3_bucket, filename)
 
 
 def clear_s3():
@@ -37,7 +37,7 @@ def clear_s3():
     6. Удаляем бэкапы
     """
     logger.info('Запускаем очистку')
-    dict_of_objects: dict = s3.list_objects(Bucket=boto_config.s3_bucket).get('Contents')
+    dict_of_objects: dict = s3.list_objects(Bucket=Config.boto_config.s3_bucket).get('Contents')
     # list_of_objects = list_of_objects.get('Contents')
     objects_by_db = {}
 
@@ -70,7 +70,7 @@ def clear_s3():
 
     for database in database_to_delete:
         try:
-            s3.delete_object(Bucket=boto_config.s3_bucket, Key=database)
+            s3.delete_object(Bucket=Config.boto_config.s3_bucket, Key=database)
             logger.info(f'Удален бэкап: {database}')
         except:
             logger.warning(f'Попытка удаления бэкапа {database} была неуспешной.')
@@ -91,7 +91,7 @@ def check_s3() -> dict:
     buckets_list = [bucket.get('Name') for bucket in buckets_dict.get('Buckets')]
 
     # Проверяем наличие указанного в конфиге бакета
-    if boto_config.s3_bucket not in buckets_list:
+    if Config.boto_config.s3_bucket not in buckets_list:
         logger.critical('Неправильно введен s3 бакет')
         return False
     
