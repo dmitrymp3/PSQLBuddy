@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 import logging
-from conf.config import temp_path, rules_for_backups, Config
+from conf.config import CommonConfig
 # import pprint
 from pprint import pprint
 
@@ -13,17 +13,17 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 logging.getLogger('nose').setLevel(logging.WARNING)
 
 # Создаем клиент для коннекта к s3 хранилищу
-s3 = boto3.client('s3', **Config.boto_config.return_data())
+s3 = boto3.client('s3', **CommonConfig.boto_config.return_data())
 
 # Добавим финальный слэш во временную папку, здесь он нужен
-temp_folder = f'{temp_path}/'
+temp_folder = f'{CommonConfig.temp_path}/'
 
 
 def upload_file(filename):
     """
     Просто загружает файл в бакет
     """
-    s3.upload_file(temp_folder + filename, Config.boto_config.s3_bucket, filename)
+    s3.upload_file(temp_folder + filename, CommonConfig.boto_config.s3_bucket, filename)
 
 
 def clear_s3():
@@ -37,7 +37,7 @@ def clear_s3():
     6. Удаляем бэкапы
     """
     logger.info('Запускаем очистку')
-    dict_of_objects: dict = s3.list_objects(Bucket=Config.boto_config.s3_bucket).get('Contents')
+    dict_of_objects: dict = s3.list_objects(Bucket=CommonConfig.boto_config.s3_bucket).get('Contents')
     # list_of_objects = list_of_objects.get('Contents')
     objects_by_db = {}
 
@@ -59,10 +59,11 @@ def clear_s3():
     # Проверяем каждую базу
     for database, backups in objects_by_db.items():
         # Получаем количество бэкапов из конфига
-        database_rules = rules_for_backups.get(database)
+        database_rules = CommonConfig.rules_for_backups.get(database)
         for type_of_backup, backups in backups.items():
             # Получаем количество хранимых бэкапов для этой базы данных и для этого типа бэкапов (DAILY, MONTHLY)
-            counter = database_rules.get(type_of_backup) if database_rules else rules_for_backups['default'][type_of_backup]
+            counter = ''
+            counter = database_rules.get(type_of_backup) if database_rules else CommonConfig.rules_for_backups['default'][type_of_backup]
             # Если количество бэкапов больше, чем нужно
             if len(backups) > counter:
                 database_to_delete.extend(backups[0:-counter])
@@ -70,7 +71,7 @@ def clear_s3():
 
     for database in database_to_delete:
         try:
-            s3.delete_object(Bucket=Config.boto_config.s3_bucket, Key=database)
+            s3.delete_object(Bucket=CommonConfig.boto_config.s3_bucket, Key=database)
             logger.info(f'Удален бэкап: {database}')
         except:
             logger.warning(f'Попытка удаления бэкапа {database} была неуспешной.')
@@ -91,7 +92,7 @@ def check_s3() -> dict:
     buckets_list = [bucket.get('Name') for bucket in buckets_dict.get('Buckets')]
 
     # Проверяем наличие указанного в конфиге бакета
-    if Config.boto_config.s3_bucket not in buckets_list:
+    if CommonConfig.boto_config.s3_bucket not in buckets_list:
         logger.critical('Неправильно введен s3 бакет')
         return False
     
@@ -104,7 +105,7 @@ def get_db_types() -> list:
     """
     Получаем список баз данных, которые хранятся в S3
     """
-    objects: dict = s3.list_objects(Bucket=Config.bucket) # получаем список объектов в бакете
+    objects: dict = s3.list_objects(Bucket=CommonConfig.boto_config.s3_bucket) # получаем список объектов в бакете
     db_names = list() # Наполняем это множество базами
 
     # Перебираем список объектов
@@ -123,7 +124,7 @@ def get_backups_by_database(database_name) -> list:
     Вытаскиваем все бэкапы выбранной базы данных
     """
     database_name += '-'
-    objects: dict = s3.list_objects(Bucket=Config.bucket)
+    objects: dict = s3.list_objects(Bucket=CommonConfig.boto_config.s3_bucket)
     backups = list()
 
     for backup in objects.get('Contents'):
@@ -137,7 +138,7 @@ def check_database(backup_name) -> bool:
     Пробуем вытащить выбранный бэкап. Если получилось - вернем True
     """
     try:
-        response = s3.get_object(Bucket=Config.bucket, Key=backup_name)
+        response = s3.get_object(Bucket=CommonConfig.boto_config.s3_bucket, Key=backup_name)
     except:
         return False
     
@@ -149,7 +150,7 @@ def download_database(backup_name) -> dict:
     """
     try:
         # print('Начинаем загрузку файла') 
-        s3.download_file(Config.bucket, backup_name, Config.path_for_backups + backup_name)
+        s3.download_file(CommonConfig.boto_config.s3_bucket, backup_name, CommonConfig.temp_path + backup_name)
         result = {'status': True, 'message': f'Загрузка завершена'}
     except ValueError:
         result = {'status': False, 'message': f'Ошибка. Код ошибки: ' + ValueError}
@@ -161,4 +162,4 @@ def upload_database(file_to_upload):
     Функция для выгрузки файла бэкапа. Бесполезная в данной реализации
     Удалить
     """
-    s3.upload_file(Config.path_for_backups + file_to_upload, Config.bucket, file_to_upload)
+    s3.upload_file(CommonConfig.temp_path + file_to_upload, CommonConfig.boto_config.s3_bucket, file_to_upload)
