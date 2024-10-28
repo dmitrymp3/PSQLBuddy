@@ -15,7 +15,7 @@ from aiogram.fsm.context import FSMContext
 from functions.s3 import get_db_types, get_backups_by_database, check_database, download_database
 from functions.db import restore_database, create_archive_database, drop_archive_database
 from functions.common import clean_temp
-from conf.config import Config
+from conf.config import CommonConfig
 
 # Импорт клавиатур
 from bot.keyboards import MyInlineKeyboardBuilder, MyReplyKeyboardBuilder
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # Создаем диспетчер
 dp = Dispatcher()
 # Накладываем фильтр, чтобы он отвечал только юзерам из списка админов
-dp.message.filter(F.from_user.id.in_(Config.tg_admins))
+dp.message.filter(F.from_user.id.in_(CommonConfig.tg_admins))
 
 # Состояния для выбора бэкапа и подтверждения
 class MyStates(StatesGroup):
@@ -115,7 +115,7 @@ async def choose_database3(message: Message, state: FSMContext):
 
 async def start_bot() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=Config.bot_token)
+    bot = Bot(token=CommonConfig.bot_token)
 
     logger.debug('before start')
     # And the run events dispatching
