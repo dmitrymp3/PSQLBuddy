@@ -1,6 +1,6 @@
 import logging
 
-from functions.common import get_backup_name, clear_temp
+from functions.common import get_backup_name, clean_temp
 from functions.db import do_backup, check_db
 from functions.s3 import upload_file, clear_s3, check_s3
 from conf.config import CommonConfig
@@ -20,7 +20,7 @@ def backup_function():
         logger.info(f'Создание резенвой копии завершено')
         upload_file(backup_filename)
         logger.info(f'Резервная копия выгружена на s3 хранилище')
-        clear_temp()
+        clean_temp()
         logger.info(f'Папка для временных файлов очищена')
 
     clear_s3()
