@@ -24,5 +24,3 @@ if __name__ == "__main__":
 
     if "--restore" in sys.argv:
         asyncio.run(start_bot())
-
-

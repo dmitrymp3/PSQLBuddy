@@ -34,50 +34,6 @@ def check_db() -> bool:
 	"""
 	return True
 
-
-####################### BOT #######################
-
-# def get_all_databases_names(conn: connection) -> list:
-#     """
-#     Получение списка всех существующих БД. Также неиспользуемая, удалить при случае
-#     """
-#     with conn.cursor() as cursor:
-#         all_databases = list()
-
-#         technical_databases = ['postgres', 'template0', 'template1']
-
-#         cursor.execute('SELECT datname FROM pg_database')
-#         raw_rows = cursor.fetchall()
-
-#         # Окультуриваем результат
-#         for row in raw_rows:
-#             if row[0] not in technical_databases:
-#                 all_databases.append(row[0])
-
-#         return all_databases
-    
-# def backup_database(db_name) -> dict:
-#     """
-#     Функция резервного копирования. Хз зачем она здесь нужна, но пусть пока останется
-#     """
-#     command = [
-#         'pg_dump',
-#         '-U', 'postgres',
-#         '-F', 'c',  # Формат: custom
-#         # '-v',  # Подробный вывод
-#         '-d', db_name,
-#         '-f', CommonConfig.temp_path + db_name + '.dump' # TODO: здесь надо формировать правильное название файла
-#     ]
-    
-#     # Выполняем команду резервного копирования
-#     try:
-#         subprocess.run(command, check=True)
-#         result = {'status': True, 'message': f'База данных {db_name} успешно сохранена в {db_name}'}
-#     except subprocess.CalledProcessError as e:
-#         result = {'status': False, 'message': f'Ошибка при резервном копировании базы данных: {e}'}
-
-#     return result
-
 def drop_archive_database() -> dict:
     """
     Сначала надо удалить БД
@@ -129,10 +85,10 @@ def restore_database(backup_file) -> dict:
     # Выполняем команду восстановления
     try:
         subprocess.run(pg_restore_command, check=True)
-        print(f'База данных успешно восстановлена из {backup_file}')
+        logger.info(f'База данных успешно восстановлена из {backup_file}')
         result = {'status': True, 'message': f"База данных успешно восстановлена из {backup_file}"}
     except subprocess.CalledProcessError as e:
-        print(f'Ошибка при восстановлении базы данных: {e}')
+        logger.info(f'Ошибка при восстановлении базы данных: {e}')
         result = {'status': False, 'message': f"Ошибка при восстановлении базы данных: {e}"}
 
     return result

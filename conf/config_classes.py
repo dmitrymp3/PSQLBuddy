@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field, InitVar
 
-
 @dataclass
 class BotoConfig:
     """
@@ -23,13 +22,7 @@ class BotoConfig:
         """
         return {k: v for k, v in self.__dict__.items() if k != 's3_bucket' and v}
     
-    # def get_bucket(self) -> str:
-    #     """
-    #     Получаем значение s3_bucket
-    #     """
-    #     return self.s3_bucket
     
-
 class AllDatabases:
     """
     Содержит список всех баз данных, каждая из которых является экземпляром класса DatabaseForBackup
@@ -47,7 +40,6 @@ class AllDatabases:
     
     def __next__(self):
         return self
-
 
 @dataclass
 class DatabaseForBackup:

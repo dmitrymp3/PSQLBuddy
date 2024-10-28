@@ -2,8 +2,6 @@ import boto3
 from botocore.exceptions import ClientError
 import logging
 from conf.config import CommonConfig
-# import pprint
-from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
@@ -15,16 +13,11 @@ logging.getLogger('nose').setLevel(logging.WARNING)
 # Создаем клиент для коннекта к s3 хранилищу
 s3 = boto3.client('s3', **CommonConfig.boto_config.return_data())
 
-# Добавим финальный слэш во временную папку, здесь он нужен
-temp_folder = f'{CommonConfig.temp_path}/'
-
-
 def upload_file(filename):
     """
     Просто загружает файл в бакет
     """
-    s3.upload_file(temp_folder + filename, CommonConfig.boto_config.s3_bucket, filename)
-
+    s3.upload_file(f'{CommonConfig.temp_path}/{filename}', CommonConfig.boto_config.s3_bucket, filename)
 
 def clear_s3():
     """
@@ -45,7 +38,6 @@ def clear_s3():
 
     for object in dict_of_objects:
         backup_name = object.get('Key')
-        # print(backup_name)
         database_name: str = backup_name.split('-')[0]
         backup_type: str = backup_name.split('-')[2].replace('.dump', '')
 
@@ -149,17 +141,9 @@ def download_database(backup_name) -> dict:
     Загружаем выбранную базу данных в папку temp
     """
     try:
-        # print('Начинаем загрузку файла') 
         s3.download_file(CommonConfig.boto_config.s3_bucket, backup_name, f'{CommonConfig.temp_path}/{backup_name}')
         result = {'status': True, 'message': f'Загрузка завершена'}
     except ValueError:
         result = {'status': False, 'message': f'Ошибка. Код ошибки: ' + ValueError}
 
     return result
-
-def upload_database(file_to_upload):
-    """
-    Функция для выгрузки файла бэкапа. Бесполезная в данной реализации
-    Удалить
-    """
-    s3.upload_file(CommonConfig.temp_path + file_to_upload, CommonConfig.boto_config.s3_bucket, file_to_upload)
