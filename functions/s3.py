@@ -150,7 +150,7 @@ def download_database(backup_name) -> dict:
     """
     try:
         # print('Начинаем загрузку файла') 
-        s3.download_file(CommonConfig.boto_config.s3_bucket, backup_name, CommonConfig.temp_path + backup_name)
+        s3.download_file(CommonConfig.boto_config.s3_bucket, backup_name, f'{CommonConfig.temp_path}/{backup_name}')
         result = {'status': True, 'message': f'Загрузка завершена'}
     except ValueError:
         result = {'status': False, 'message': f'Ошибка. Код ошибки: ' + ValueError}
