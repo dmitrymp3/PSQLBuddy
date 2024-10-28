@@ -5,25 +5,15 @@ from conf.config import CommonConfig
 
 logger = logging.getLogger(__name__)
 
-# DUMPER FUNC #
-def clear_temp():
+def clean_temp():
     """
     Очищаем файлы в папке для временных файлов.
     """
-    logger.info(f'Очищаем файлы в папке {CommonConfig.temp_path}')
     files_in_temp = os.listdir(CommonConfig.temp_path)
     for filename in files_in_temp:
-        os.remove(CommonConfig.temp_path + '/' +filename)
+        os.remove(CommonConfig.temp_path + filename)
         logger.info(f'Файл удален: {filename}')
     logger.info(f'Все файлы удалены')
-
-# BOT FUNC #
-def clean_temp():
-    files_in_temp = os.listdir(CommonConfig.temp_path[:-1])
-    for filename in files_in_temp:
-        os.remove(CommonConfig.temp_path + filename)
-        # logger.info(f'Файл удален: {filename}')
-    # logger.info(f'Все файлы удалены')
 
 def get_backup_name() -> str:
     """
