@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def clean_temp():
     """
-    Очищаем файлы в папке для временных файлов.
+    Очищаем временную папку
     """
     files_in_temp = os.listdir(CommonConfig.temp_path)
     for filename in files_in_temp:
