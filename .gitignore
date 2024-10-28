@@ -21,3 +21,4 @@ config.py
 PgBackupS3/
 PgBackupMaster/
 .vscode
+test.py

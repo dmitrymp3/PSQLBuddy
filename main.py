@@ -2,10 +2,8 @@ import logging
 import sys
 import asyncio
 
-from src.backup import check_function, main_function
-# from src.restore import start_bot
+from src.backup import check_function, backup_function
 from bot.bot_init import start_bot
-
 
 # Создаем логгер
 logging.basicConfig(
@@ -17,19 +15,12 @@ logging.basicConfig(
     )
 logger = logging.getLogger(__name__)
 
-
 if __name__ == "__main__":
     if "--backup" in sys.argv:
-        logger.info('***'*15)
         logger.info('Запуск программы')
-        logger.info('***'*15)
         check_function()
-        logger.info('Проверки пройдены успешно')
-        logger.info(f'Запускаем бэкапы')
-        main_function()
+        backup_function()
         logger.info('Создание бэкапов завершено')
 
     if "--restore" in sys.argv:
         asyncio.run(start_bot())
-
-
