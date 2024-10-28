@@ -11,7 +11,7 @@ def clean_temp():
     """
     files_in_temp = os.listdir(CommonConfig.temp_path)
     for filename in files_in_temp:
-        os.remove(CommonConfig.temp_path + filename)
+        os.remove(f'{CommonConfig.temp_path}/{filename}')
         logger.info(f'Файл удален: {filename}')
     logger.info(f'Все файлы удалены')
 
