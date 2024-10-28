@@ -124,7 +124,7 @@ def restore_database(backup_file) -> dict:
         '-U', 'postgres',
         '-d', 'archive',
         # '-v',  # Подробный вывод
-        CommonConfig.temp_path + backup_file
+        f'{CommonConfig.temp_path}/{backup_file}'
     ]
     # Выполняем команду восстановления
     try:
