@@ -1,18 +1,18 @@
 import logging
 
-from functions.common import get_backup_name, clear_temp
+from functions.common import get_backup_name, clean_temp
 from functions.db import do_backup, check_db
 from functions.s3 import upload_file, clear_s3, check_s3
-from conf.config import databases
+from conf.config import CommonConfig
 import sys
 
 logger = logging.getLogger(__name__)
 
-def main_function():
+def backup_function():
     """
     Перебираем каждую базу и резервируем ее. В конце очищаем лишние бэкапы
     """
-    for database in databases:
+    for database in CommonConfig.databases:
         logger.info(f'Начали обработку базы данных {database.name}')
         backup_filename = f'{database.name}-{get_backup_name()}'
         logger.info(f'Название для бэкапа: {backup_filename}')
@@ -20,7 +20,7 @@ def main_function():
         logger.info(f'Создание резенвой копии завершено')
         upload_file(backup_filename)
         logger.info(f'Резервная копия выгружена на s3 хранилище')
-        clear_temp()
+        clean_temp()
         logger.info(f'Папка для временных файлов очищена')
 
     clear_s3()

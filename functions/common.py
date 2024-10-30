@@ -1,29 +1,19 @@
 import os
 import logging
 from datetime import date
-from conf.config import temp_path
+from conf.config import CommonConfig
 
 logger = logging.getLogger(__name__)
 
-# DUMPER FUNC #
-def clear_temp():
+def clean_temp():
     """
-    Очищаем файлы в папке для временных файлов.
+    Очищаем временную папку
     """
-    logger.info(f'Очищаем файлы в папке {temp_path}')
-    files_in_temp = os.listdir(temp_path)
+    files_in_temp = os.listdir(CommonConfig.temp_path)
     for filename in files_in_temp:
-        os.remove(temp_path + '/' +filename)
+        os.remove(f'{CommonConfig.temp_path}/{filename}')
         logger.info(f'Файл удален: {filename}')
     logger.info(f'Все файлы удалены')
-
-# BOT FUNC #
-def clean_temp():
-    files_in_temp = os.listdir(Config.path_for_backups[:-1])
-    for filename in files_in_temp:
-        os.remove(Config.path_for_backups + filename)
-        # logger.info(f'Файл удален: {filename}')
-    # logger.info(f'Все файлы удалены')
 
 def get_backup_name() -> str:
     """
