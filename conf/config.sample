@@ -1,67 +1,34 @@
 from conf.config_classes import BotoConfig, DatabaseForBackup
-
-# Конфигурация s3-клиента
-boto_config = BotoConfig(
-    aws_access_key_id='',
-    aws_secret_access_key='',
-    s3_bucket=''
-)
-
-# Список баз данных для бэкапа в формате множества
-db_list = {'buh2_db', 'spartak_db', 'zup3'}
-
-# Папка, где будут временно размещены созданные бэкапы перед загрузкой в s3. Внимание! Автоматически очищается целиком.
-temp_path = 'temp'
-
-rules_for_backups = {
-    'buh2_db'   : {
-        'DAILY'     : 10,
-        'WEEKLY'    : 5,
-        'MONTHLY'   : 36,
-        'YEARLY'    : 999,
-    },
-    'default'       : {
-        'DAILY'     : 4,
-        'WEEKLY'    : 4,
-        'MONTHLY'   : 4,
-        'YEARLY'    : 999,
-    }
-}
-
-databases = [
-    DatabaseForBackup('buh2_db'),
-    DatabaseForBackup('spartak_db'),
-    DatabaseForBackup('zup3'),
-]
-
-############## BOT ##############
 from dataclasses import dataclass
-from botocore.config import Config as BotoConfig
 
 @dataclass
-class Config:
-    db_name = 'postgres'
-    user = ''
-    password = ''
-    backup_file = ''
-    host = 'localhost'
+class CommonConfig:
+    """
+    Заполнять обязательно не все. Если вам нужен только модуль делающий бэкапы - можете заполнить
+    только данные отмеченные в комментарии как BACKUP.
+    """
 
-    databases_for_backup = {'buh2_db', 'spartak_db', 'zup3'}
+    # BACKUP
+    # Если ввести только название базы - то периодичность хранения 
+    # резервных копий будет установлена по умолчанию ()
+    databases = [
+        DatabaseForBackup(''),
+    ]
 
-    root_password = ''
+    # BACKUP & RESTORE
+    boto_config = BotoConfig(
+        aws_access_key_id='',
+        aws_secret_access_key='',
+        s3_bucket=''
+    )
 
-    path_for_backups = '/home/pg_restore/temp/'
-
-    boto_config = {
-        # 'service_name'              : 's3',
-        'aws_access_key_id'         : '',
-        'aws_secret_access_key'     : '',
-        'endpoint_url'              : 'https://s3.timeweb.com',
-        'config'                    : BotoConfig(region_name='ru-1', signature_version='s3v4'),
-        'bucket'                    : ''
-    }
-    bucket = ''
-
+    # RESTORE
     bot_token = ''
+    tg_admins = {} # Дима, Витя
 
-    tg_admins = {66666666, 777777777} # Дима, Витя
+    # BACKUP & RESTORE
+    # Папка, где будут временно размещены созданные бэкапы перед загрузкой в s3. 
+    # Сюда же загружаются бэкапы перед восстановлением. 
+    # Внимание! Автоматически очищается целиком. 
+    # Можно не менять. По умолчанию папка в программе
+    temp_path = 'temp'
