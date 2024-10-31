@@ -14,9 +14,9 @@ def backup_function():
     """
     for database in CommonConfig.databases:
         logger.info(f'Начали обработку базы данных {database.name}')
-        backup_filename = f'{database.name}-{get_backup_name()}'
+        backup_filename = f'{database}-{get_backup_name()}'
         logger.info(f'Название для бэкапа: {backup_filename}')
-        do_backup(database.name, backup_filename)
+        do_backup(database, backup_filename)
         logger.info(f'Создание резенвой копии завершено')
         upload_file(backup_filename)
         logger.info(f'Резервная копия выгружена на s3 хранилище')
