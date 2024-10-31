@@ -107,5 +107,5 @@ class AllDatabases:
         return f'{self.databases_dict}'
 
     def __iter__(self):
-        for key, value in self.databases_dict.items():
-            yield key, value
+        for name in self.databases_dict.keys():
+            yield name
