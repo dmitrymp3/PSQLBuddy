@@ -13,7 +13,7 @@ def backup_function():
     Перебираем каждую базу и резервируем ее. В конце очищаем лишние бэкапы
     """
     for database in CommonConfig.databases:
-        logger.info(f'Начали обработку базы данных {database.name}')
+        logger.info(f'Начали обработку базы данных {database}')
         backup_filename = f'{database}-{get_backup_name()}'
         logger.info(f'Название для бэкапа: {backup_filename}')
         do_backup(database, backup_filename)
