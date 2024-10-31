@@ -50,12 +50,10 @@ def clear_s3():
 
     # Проверяем каждую базу
     for database, backups in objects_by_db.items():
-        # Получаем количество бэкапов из конфига
-        database_rules = CommonConfig.rules_for_backups.get(database)
         for type_of_backup, backups in backups.items():
-            # Получаем количество хранимых бэкапов для этой базы данных и для этого типа бэкапов (DAILY, MONTHLY)
-            counter = ''
-            counter = database_rules.get(type_of_backup) if database_rules else CommonConfig.rules_for_backups['default'][type_of_backup]
+            # Получаем количество хранимых бэкапов для этой базы данных и для этого типа бэкапов (type_of_backup='DAILY', MONTHLY, etc)
+            counter = CommonConfig.databases.get_database_freq(database_name).get(type_of_backup)
+
             # Если количество бэкапов больше, чем нужно
             if len(backups) > counter:
                 database_to_delete.extend(backups[0:-counter])
