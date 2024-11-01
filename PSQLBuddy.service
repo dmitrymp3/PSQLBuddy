@@ -6,8 +6,8 @@ After=network.target
 [Service]
 Type=simple
 User=postgres
-WorkingDirectory=/home/backup/PostgresBackupBot
-ExecStart=/home/backup/PostgresBackupBot/venv/bin/python3 main.py
+WorkingDirectory=/home/postgres/PSQLBuddy
+ExecStart=/home/postgres/PSQLBuddy/venv/bin/python3 main.py --restore
 Restart=always
 
 [Install]
