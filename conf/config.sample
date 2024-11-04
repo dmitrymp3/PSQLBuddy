@@ -1,4 +1,4 @@
-from conf.config_classes import BotoConfig, DatabaseForBackup
+from conf.config_classes import BotoConfig, AllDatabases
 from dataclasses import dataclass
 
 @dataclass
@@ -7,13 +7,29 @@ class CommonConfig:
     Заполнять обязательно не все. Если вам нужен только модуль делающий бэкапы - можете заполнить
     только данные отмеченные в комментарии как BACKUP.
     """
+    # Инициализация экземпляра класса, управляющего списком БД. Не трогать
+    databases = AllDatabases()
 
     # BACKUP
+    # Количество хранимых копий - значения по умолчанию для всех баз
+    databases.set_default_freq({
+        'DAILY'     : 4,
+        'WEEKLY'    : 4,
+        'MONTHLY'   : 4,
+        'YEARLY'    : 999,
+    })
+
+    # Здесь добавляем новые базы данных
     # Если ввести только название базы - то периодичность хранения 
-    # резервных копий будет установлена по умолчанию ()
-    databases = [
-        DatabaseForBackup(''),
-    ]
+    # резервных копий будет установлена по умолчанию (см.выше)
+    databases.add_database('volleyball_db')
+    databases.add_database('basketball_db', {'WEEKLY': 10})
+    databases.add_database('super_db', {
+        'DAILY'     : 44,
+        'WEEKLY'    : 22,
+        'MONTHLY'   : 11,
+        'YEARLY'    : 1,
+    })
 
     # BACKUP & RESTORE
     boto_config = BotoConfig(
@@ -23,8 +39,10 @@ class CommonConfig:
     )
 
     # RESTORE
+    # Токен бота
     bot_token = ''
-    tg_admins = {} # Дима, Витя
+    # Telegram-ID пользователей бота
+    tg_admins = {}
 
     # BACKUP & RESTORE
     # Папка, где будут временно размещены созданные бэкапы перед загрузкой в s3. 
